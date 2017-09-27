@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+/* my program simulate linux command wc */
+/* author: xiaowh0 */
+/* date: 2017-9-25 */
+
+void my_wc(int [],char);
+extern int flag=1;
+int main(int argc,char *argv[])
+{
+        FILE *fp;
+        int c,i,j;
+        int res_current[3]; /* res_current[0] represent current file's line,res_current[1] represent current file's word,res_current[2] represent
+                                            current file's character */
+        int res_total[3]; /* res_total[0] represent all files's line,res_total[1] represent all files's word,res_total[2] represent all files's character */
+
+        for(i=0;i<3;i++)
+        {
+                res_current=0;
+                res_total=res_current;
+        }
+
+        if(argc==1) /* no input file,input come from stdin */
+        {
+                while((c=getchar())!=EOF)
+                        my_wc(res_total,c);
+                printf("\t%d\t%d\t%d\n",res_total[0],res_total[1],res_total[2]);
+        }
+        else
+        {
+                j=0;
+                while(++j<argc)
+                {
+                        if((fp=fopen(argv[j],"r"))==NULL)
+                        {
+                                printf("Can not open the file %s\n",argv[j]);
+                                exit(0);
+                        }
+                        c=fgetc(fp);
+                        while(c!=EOF)
+                        {
+                                my_wc(res_current,c);
+                                c=fgetc(fp);
+                        }
+                        fclose(fp);
+                        printf(" %d  %d %d %s\n",res_current[0],res_current[1],res_current[2],argv[j]);
+                        for(i=0;i<3;i++)
+                        {
+                                res_total+=res_current;
+                                res_current=0;
+                        }
+                }
+                printf(" %d  %d %d total\n",res_total[0],res_total[1],res_total[2]);
+        }
+}
+
+void my_wc(int res_current[],char c)
+{
+        int flag;
+        res_current[2]++;
+        if(c=='\n')
+        {
+                res_current[0]++;
+        }
+        if(c=='\t' || c== ' ' || c=='\n')
+        {
+                if(flag==0)
+                {
+                        res_current[1]++;
+                         flag=1;
+                }
+        }
+        else
+                flag=0;        
+        
+}
+
+from  http://bbs.chinaunix.net/thread-3753945-1-1.html
